@@ -1,0 +1,18 @@
+<?php
+
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+
+use App\Model;
+use Faker\Generator as Faker;
+use App\Post;
+use App\User;
+
+$factory->define(App\Like::class, function (Faker $faker) {
+    $users = User::pluck('id');
+    $posts = Post::pluck('id');
+    
+    return [
+        'user_id' => $faker->randomElement($users),
+        'post_id' => $faker->randomElement($posts),    
+    ];
+});
