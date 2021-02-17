@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Comment as CommentResource;
 use Illuminate\Support\Facades\Validator;
 
+
 class CommentsController extends Controller
 {
     /**
@@ -74,7 +75,9 @@ class CommentsController extends Controller
      */
     public function show($id)
     {
-        //
+        $comment = Comment::findOrFail($id);
+
+        return new CommentResource($comment);
     }
 
     /**
@@ -90,14 +93,13 @@ class CommentsController extends Controller
         $validator = Validator::make($request->all(), [
             
             'description' => 'required',
+            'image' => 'nullable|sometimes|mimes:jpeg,png,jpg,gif,svg|max:2048'
           
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-
-
 
         if(Auth::user()->id == $request->input('user_id')){
 

@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import {users} from './modules/users'
 import {posts} from './modules/posts'
+import {sexes} from './modules/sexes'
 
 Vue.use(Vuex)
 
@@ -10,7 +11,8 @@ export const store = new Vuex.Store({
     
     modules: {
         users,
-        posts
+        posts,
+        sexes
     },
    
     state: {
@@ -102,11 +104,17 @@ export const store = new Vuex.Store({
 
         register(context,data){
             return new Promise((resolve,reject) => {
-                axios.post('/api/auth/register',{
-                    name : data.username,
-                    email: data.email,
-                    password: data.password
-                })
+                
+                let user_data = new FormData();
+                
+                user_data.append('name',data.username);
+                user_data.append('email',data.email);
+                user_data.append('password',data.password);
+                user_data.append('profile_description',data.profile_description);
+                user_data.append('image',data.image);
+                user_data.append('sex_id',data.sex_id);
+
+                axios.post('/api/auth/register',user_data)
                 .then(response => {
                    resolve(response)
                 })

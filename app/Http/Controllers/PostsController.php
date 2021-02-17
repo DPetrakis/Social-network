@@ -18,7 +18,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('created_at','desc')->paginate(5);
+        $posts = Post::orderBy('created_at','desc')->get();
 
         return PostResource::collection($posts);
     }
@@ -31,20 +31,20 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            
-            'description' => 'required',
-            'image' => 'nullable|sometimes|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
        
-        $id = Auth::user()->id;
-        
-        if($id == $request->input('user_id')){
+       
+        if(Auth::user()->id == $request->input('user_id')){
 
+            $validator = Validator::make($request->all(), [
+            
+                'description' => 'required',
+                'image' => 'nullable|sometimes|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+            
             $post = new Post();
             $post->description = $request->get('description');
             $post->user_id = $request->get('user_id');
@@ -91,21 +91,25 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
-        $validator = Validator::make($request->all(), [
-            
-            'description' => 'required',
-            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048'
-
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-        
        
         
+        
         if(Auth::user()->id == $request->input('user_id')){
+            
+            
+            $validator = Validator::make($request->all(), [
+            
+                'description' => 'required',
+                'image' => 'nullable|sometimes|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+
+
 
             $post = Post::findOrFail($id);
             $post->description = $request->get('description');

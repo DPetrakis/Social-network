@@ -6,9 +6,9 @@
                     <div class="col-md-4">
                         <div class="profile-img">
                             <img :src="'/images/' + user.profile.profile_image"  alt=""/>
-                            <div class="file btn btn-lg btn-primary">
+                            <div v-if="loggedInUser.id == user.id" class="file btn btn-lg btn-primary">
                                 Change Photo
-                                <input type="file" name="file"/>
+                                <input @change="selectFile" accept="image/*" type="file" name="file"/>
                             </div>
                         </div>
                     </div>
@@ -20,6 +20,7 @@
                                     <h6>
                                        {{user.profile.description}}
                                     </h6>
+                                    <h6>{{user.sex.description}}<span><i style="padding-left:4px" class="fa fa-male fa-lg"></i></span></h6>
                                     <p class="proile-rating"><span></span></p>
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                                 <li class="nav-item">
@@ -32,7 +33,12 @@
                         </div>
                     </div>
                     <div v-if="loggedInUser.id == user.id" class="col-md-2">
-                        <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
+                   
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal"  :data-target="'#user'+ user.id">
+                            Edit Profile
+                        </button>
+                        <EditUser :user_id="user.id" />
                     </div>
                 </div>
                 <div class="row">
@@ -42,8 +48,13 @@
                     <div class="col-md-8">
                     <div class="tab-content profile-tab" id="myTabContent">
                      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <div v-for="post in user.posts" v-bind:key="post.id" class="card gedf-card">
-                             <Post :post = post />
+                        <div v-if="user.posts.length">
+                            <div v-for="post in user.posts" v-bind:key="post.id" class="card gedf-card">
+                                <Post :post = post />
+                            </div>
+                        </div>
+                        <div v-else> 
+                            <h4>{{user.name}} hasn't made any posts yet!</h4>
                         </div>
                      </div>
                             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -60,14 +71,20 @@
                 </div>
             </form>           
         </div>
+
     </div>
 </template>
 <script>
+
+
 import Post from './Post.vue'
+import EditUser from './widgets/EditUser.vue'
+
 export default {
 
     components: {
-        Post        
+        Post,
+        EditUser
     },
     computed: {
         
@@ -86,13 +103,44 @@ export default {
         },
 
     },
-    
-    
+
+    data(){
+        
+        return {
+              image: ""
+        }
+      
+    },
+
     created() {
-       
+      
        this.$store.dispatch('users/retrieveUser',this.$route.params.id);
        
+    },
+
+    methods: {
+        
+        selectFile: function(event){
+            
+            this.image = event.target.files[0];
+            this.$store.dispatch('users/updatePic',{
+                
+                image: this.image,
+                id: this.$route.params.id
+            
+            }).then((response) => {
+               this.user.profile.profile_image = response.data;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        }
+
+        
     }
+
+   
    
 }
 </script>

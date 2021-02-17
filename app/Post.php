@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
+    protected $fillable = [
+        'image',
+    ];
+
+
 
     public function likes(){
         return $this->hasMany(Like::class);

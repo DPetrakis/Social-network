@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "font-awesome": "^4.7.0",
+        "object-path-immutable": "^4.1.1",
         "vue-router": "^3.4.9",
         "vuex": "^3.6.0"
     }

@@ -49,8 +49,8 @@
                   placeholder="What are you thinking?"
                 ></textarea>
                 <div v-if="errors" class="mt-4">
-                <div v-for="error in errors" v-bind:key="error.id" class="alert alert-danger" role="alert">
-                    {{error[0]}}
+                <div v-for="error in errors.description" v-bind:key="error.id" class="alert alert-danger" role="alert">
+                    {{error}}
                 </div>
                 </div>
               </div>
@@ -65,6 +65,11 @@
                 <div class="custom-file">
                   <input @change="selectFile" type="file" ref="file" class="custom-file-input" id="customFile">
                   <label class="custom-file-label" for="customFile">Upload image</label>
+                  <div v-if="errors" class="mt-4">
+                  <div v-for="error in errors.image" v-bind:key="error.id" class="alert alert-danger" role="alert">
+                    {{error}}
+                  </div>
+                  </div>
                 </div>
               </div>
               <div class="py-4"></div>

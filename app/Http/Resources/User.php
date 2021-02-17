@@ -21,7 +21,8 @@ class User extends JsonResource
            "name" => $this->name,
            "email" => $this->email,
            "posts" => PostResource::collection($this->posts),
-           "profile" => $this->profile
+           "profile" => $this->profile,
+           "sex" => $this->sex
          
        ];
     }

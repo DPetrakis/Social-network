@@ -82,4 +82,18 @@ class User extends Authenticatable implements JWTSubject
     
     }
 
+    public function sex(){
+        return $this->belongsTo(Sex::class);
+    }
+
+
+    public function scopeSearchByLetter($query,$letter)
+    
+    {
+        
+        return $query->where('name', 'LIKE','%'. $letter .'%' );
+    
+    }
+
+
 }

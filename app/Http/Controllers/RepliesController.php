@@ -78,7 +78,9 @@ class RepliesController extends Controller
      */
     public function show($id)
     {
-        //
+        $reply = Reply::findOrFail($id);
+
+        return new ReplyResource($reply);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
+use App\Profile;
 use Validator;
 
 class AuthController extends Controller
@@ -48,9 +49,13 @@ class AuthController extends Controller
     public function register(Request $request) {
         
         $validator = Validator::make($request->all(), [
+            
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
+            'profile_description' =>'required|string|max:50',
+            'image' => 'required|max:2048',
+            'sex_id' => 'required'
         ]);
 
         if($validator->fails()){
@@ -59,8 +64,29 @@ class AuthController extends Controller
 
         $user = User::create(array_merge(
                     $validator->validated(),
-                    ['password' => bcrypt($request->password)]
-                ));
+                    ['password' => bcrypt($request->password)],
+                    
+        ));
+
+        $user->sex_id = $request->get('sex_id');
+        $user->save();
+
+        if(request()->file('image')) {
+                
+            $image = request()->file('image');
+            $imageName = $image->getClientOriginalName();
+            $imageName = time() .'_'. $imageName; 
+            $image->move(public_path('/images'),$imageName);
+            $profile_image = '/' . $imageName;
+        }
+        
+        $profile = Profile::create([
+            
+            'user_id' => $user->id,
+            'description' => $request->get('profile_description'),
+            'profile_image' => $profile_image
+        
+        ]); 
 
         return response()->json([
             'message' => 'User successfully registered',

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
-use App\Http\Resources\User as UserResource;
+use App\Sex;
+use App\Http\Resources\Sex as SexResource;
 
 
-class UserController extends Controller
+class SexesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+       $sexes = Sex::all();
+
+       return SexResource::collection($sexes);
     }
 
     /**
@@ -38,9 +40,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::findOrFail($id);
-
-        return new UserResource($user);
+        //
     }
 
     /**
@@ -65,6 +65,4 @@ class UserController extends Controller
     {
         //
     }
-
-   
 }

@@ -33,19 +33,27 @@
          
    
         </ul>
-        <form class="form-inline">
-          <div class="md-form my-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-          </div>
-        </form>
+          
+          <SearchUser /> 
+
+        
       </div>
     </nav>
     <!--/.Navbar blue-->
   </div>    
 </template>
 <script>
+
+import SearchUser from './widgets/SearchUser.vue';
+
 export default {
+
+    components: {
+      SearchUser
+    },
+
     computed: {
+    
       loggedIn(){
         return this.$store.getters.loggedIn
       },

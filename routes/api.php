@@ -32,29 +32,41 @@ Route::group([
 });
 
 
-Route::get('/posts','PostsController@index');
-Route::get('/posts/{id}','PostsController@show');
-Route::get('/users/{id}', 'UserController@show'); 
+Route::get('/sexes','SexesController@index');
 Route::get('/profile/{id}','ProfileController@show');
 
-Route::middleware('auth:api')->post('/likes','LikesController@store');
-Route::middleware('auth:api')->delete('/likes','LikesController@destroy');
-Route::middleware('auth:api')->get('/likes','LikesController@index');
+Route::group(['middleware' => 'auth:api'],function(){
+    
+    Route::post('/users/search','UsersController@search');
+    Route::put('/users/{user}','UsersController@update');
+    Route::get('/users/{user}','UsersController@show');
+    Route::post('/users/{user}','UsersController@updateProfilePic');
 
-Route::middleware('auth:api')->post('/commentlikes','CommentLikesController@store');
-Route::middleware('auth:api')->delete('/commentlikes','CommentLikesController@destroy');
+    Route::get('/posts','PostsController@index');
+    Route::get('/posts/{id}','PostsController@show');
+    Route::delete('/posts/{post}','PostsController@destroy');
+    Route::post('/posts','PostsController@store');
+    Route::get('/posts/{post}/likes','PostsController@getLikes');
+    //Axios couldn't send form data with put request thats why i used post in order to update files..
+    Route::post('/posts/{post}','PostsController@update');
 
-Route::middleware('auth:api')->post('/comments','CommentsController@store');
-Route::middleware('auth:api')->delete('/comments/{comment}','CommentsController@destroy');
-Route::middleware('auth:api')->post('/comments/{comment}','CommentsController@update');
+    Route::post('/replies','RepliesController@store');
+    Route::delete('/replies/{reply}','RepliesController@destroy');
+    Route::post('replies/{reply}','RepliesController@update');
+    Route::get('replies/{reply}','RepliesController@show');
 
-Route::middleware('auth:api')->post('/replies','RepliesController@store');
-Route::middleware('auth:api')->delete('/replies/{reply}','RepliesController@destroy');
-Route::middleware('auth:api')->post('replies/{reply}','RepliesController@update');
+    Route::post('/comments','CommentsController@store');
+    Route::delete('/comments/{comment}','CommentsController@destroy');
+    Route::post('/comments/{comment}','CommentsController@update');
+    Route::get('/comments/{comment}','CommentsController@show');
 
+    Route::post('/likes','LikesController@store');
+    Route::delete('/likes','LikesController@destroy');
+    Route::get('/likes','LikesController@index');
 
+    Route::post('/commentlikes','CommentLikesController@store');
+    Route::delete('/commentlikes','CommentLikesController@destroy');
 
-Route::middleware('auth:api')->post('/posts/{post}','PostsController@update');
-Route::middleware('auth:api')->delete('/posts/{post}','PostsController@destroy');
-Route::middleware('auth:api')->post('/posts','PostsController@store');
-Route::middleware('auth:api')->get('/posts/{post}/likes','PostsController@getLikes');
+    
+    
+});

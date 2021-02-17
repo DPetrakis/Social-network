@@ -15,6 +15,19 @@
           <label for="password">Password:</label>
           <input type="password" id="password" name="user_password" v-model="user.password">
 
+          <label for="password">Profile description</label>
+          <textarea type="text" v-model="user.profile.description"></textarea>
+            
+          <label>Select Gender</label>
+          <select v-model="user.sex_id" id="inputState" class="form-control">
+           <option v-for="sex in sexes" v-bind:key="sex.id" v-bind:value="sex.id">{{sex.description}}</option>
+          </select>
+
+
+          <label for="password">Upload profile picture</label>
+          <input @change="selectFile" type="file" accept="image/*">
+          
+        
        
         </fieldset>
         
@@ -31,16 +44,43 @@ export default {
         user: {
           username: "",
           email: "",
-          password: ""
+          password: "",
+          sex_id: Number,
+          profile: {
+            description: "",
+            profile_pic: ""
+          },
+
+          
         }
       }
     },
+
+    computed: {
+        
+        sexes(){
+            return this.$store.getters['sexes/sexes']
+        },
+
+    },
+
+    created(){
+        
+        this.$store.dispatch('sexes/retrieveSexes');
+     
+    },
+
     methods: {
+      
       register:function(){
         this.$store.dispatch('register',{
+
            username: this.user.username,
            email: this.user.email,
-           password: this.user.password
+           password: this.user.password,
+           profile_description: this.user.profile.description,
+           image: this.user.profile.profile_pic,
+           sex_id: this.user.sex_id
         })
         .then(response => {
            this.$router.push('/login');
@@ -48,7 +88,15 @@ export default {
         .catch(error =>{
            console.log(error.response.data);
         })
+      },
+
+      selectFile: function(event){
+
+          this.user.profile.profile_pic = event.target.files[0];
+      
       }
+
+    
     }
 }
 </script>

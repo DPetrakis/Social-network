@@ -10,16 +10,20 @@
                 <br>
                 <small>{{reply.created_at}}</small>
                 <a  href="#!"  class="card-link"><i class="fa fa-gittip"></i> Like</a>
-            <!--<a  href="#!"  @click="showReplySection()" class="card-link"><i class="fa fa-comment"></i>Reply</a>-->
+                <!--<a  href="#!"  @click="showReplySection()" class="card-link"><i class="fa fa-comment"></i>Reply</a>-->
                 <a v-if="loggedInUser.id == reply.user.id" href="#!" @click="deleteReply(reply.id)"  class="card-link"><i class="fa fa-trash"></i>Delete</a>
-                <a v-if="loggedInUser.id == reply.user.id" href="#!" @click="EditReply(reply.id)"  class="card-link"><i class="fa fa-edit"></i>Edit</a> 
+                <a v-if="loggedInUser.id == reply.user.id" href="#!"  data-toggle="modal" :data-target="'#editReply' + reply.id" class="card-link"><i class="fa fa-edit"></i>Edit</a> 
                 </p>
         </div> 
+        <EditReply :reply_id="reply.id" />
     </div>   
 </template>
 <script>
-
+import EditReply from './widgets/EditReply.vue';
 export default {
+    components: {
+        EditReply
+    },
     props: {
         reply: Object
     },

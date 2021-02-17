@@ -47,7 +47,7 @@
                 >Delete<i class="fa fa-trash"></i
               ></a>
             </div>
-            <EditPost :post="post" />
+            <EditPost :post_id="post.id" />
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@
       <div v-for="comment in commentsToShow" v-bind:key="comment.id">
         <Comment :comment="comment" />
       </div>
-      <a v-if="post.comments.length" href="#!" @click="IncreaseLimit()">Load more comments..</a>
+    <!-- <a v-if="post.comments.length" href="#!" @click="increaseLimit()">Load more comments..</a> -->
     </div>
     <div class="card-footer">
     
@@ -268,13 +268,17 @@ export default {
         });
     },
 
-    IncreaseLimit: function() {
+    increaseLimit: function() {
         this.limitNumber = this.limitNumber + 5;
     },
   },
 };
 </script>
 <style scoped>
+
+
+
+
 .post-image {
   width: 550px;
   height: 300px;

@@ -9,7 +9,7 @@
             <h4 class="media-heading title">{{comment.user.name}}</h4>
             <div class="komen">
                
-                <description class="comment-description">{{comment.description}}</description>
+                <span class="comment-description">{{comment.description}}</span>
                 <br>
                 <small>{{comment.created_at}}</small><span><a data-toggle="modal" :data-target="'#commentLikesModal' + comment.id" href="#!" class="text-muted"><small>/Likes({{ comment.commentlikes.length }})</small></a>
                 </span><br>
@@ -18,8 +18,8 @@
                  <a v-else-if="message == 'Dislike'"  href="#!" @click="dislikeComment(comment.id)" class="card-link"><i class="fa fa-gittip"></i>Dislike</a>
                 <a  href="#!" @click="showReplySection()"  class="card-link"><i class="fa fa-comment"></i>Reply</a>
                 <a v-if="loggedInUser.id == comment.user.id" href="#!" @click="deleteComment(comment.id)"  class="card-link"><i class="fa fa-trash"></i>Delete</a>
-                <a v-if="loggedInUser.id == comment.user.id" href="#!"   data-toggle="modal" data-target="#editCommentModal" class="card-link"><i class="fa fa-edit"></i>Edit</a> 
-               
+                <a v-if="loggedInUser.id == comment.user.id" href="#!"   data-toggle="modal" :data-target="'#editComment' + comment.id" class="card-link"><i class="fa fa-edit"></i>Edit</a> 
+                <EditComment :comment_id="comment.id"/>
             </div>
           
       
@@ -39,9 +39,10 @@
                 <Reply :reply = reply />
             
             </div>
-            <a v-if="comment.replies.length" class="load-more-replies" href="#!" @click="increaseLimit()">Load more replies..</a>
+           <!-- <a v-if="comment.replies.length" class="load-more-replies" href="#!" @click="increaseLimit()">Load more replies..</a> -->
         </div> 
         <CommentLikes :comment ="comment" />
+      
     </div>
            
     
@@ -52,6 +53,7 @@
 import Reply from './Reply.vue'
 import EditComment from './widgets/EditComment.vue';
 import CommentLikes from './widgets/CommentLikes.vue';
+
 
 export default {
     
@@ -156,6 +158,7 @@ export default {
             this.$store.dispatch('posts/likeComment',{
                
                user_id : this.loggedInUser.id,
+               post_id: this.comment.post_id,
                comment_id: id
             
             }).then(response => {

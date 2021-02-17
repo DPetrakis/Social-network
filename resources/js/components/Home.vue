@@ -6,77 +6,75 @@
         <div class="row">
             <div class="col-md-3">
                 
-              <Search />
+                <!--  <SearchUser /> -->
             
             </div>
             <div class="col-md-6 gedf-main">
                 <CreatePost />
-                <div v-for="post in posts" v-bind:key="post.id" class="card gedf-card mb-4">
+                <div v-for="post in postsToShow" v-bind:key="post.id" class="card gedf-card mb-4">
                   <Post :post = post />
+                
                 </div>
-               
+                <button type="button"  @click="increaseLimit()"  class="btn btn-primary btn-lg btn-block">Load older posts</button>
             </div>
        
             <div class="col-md-3">
-              
+            
             </div>
            
         </div>
-          
-    </div>
     
+    </div>
+    <div style="height:100px">
+    </div>
     </div>
 </template>
 <script>
-import Search from './widgets/Search.vue'
+
 import Post from './Post.vue'
 import CreatePost from './widgets/CreatePost.vue'
 
 export default {
 
     components: {
-        Search,
         Post,
-        CreatePost
+        CreatePost,
+   
     },
 
     data() {
         
         return {
             
-            comment_section: {
-                display : "none"
-            },
-
-            reply_section: {
-                display: "none"
-            },
-            
-            comment_description : "",
-            
-            comment_reply: ""
-
+           limitNumber: 5
+     
         }
     },
     computed: {
         
-        posts(){
+     /*   posts(){
             return this.$store.getters['posts/posts']
-        },
+        }, */
+
+        postsToShow: function() {
+            return this.$store.getters['posts/posts'].slice(0,this.limitNumber);
+        }   
+
+        
 
      
     },
+
     created(){
         this.$store.dispatch('posts/retrievePosts');
     },
 
     methods: {
         
-        showMorePosts: function(){
-
-            alert('i am the best ill never give up');
-        
-        }
+      
+        increaseLimit: function() {
+            this.limitNumber = this.limitNumber + 5;
+        },
 
     }
 
@@ -84,6 +82,11 @@ export default {
 }
 </script>
 <style scoped>
+
+        .card {
+            margin-top: 55px;
+        }
+
         body {
             background-color: #eeeeee;
         }

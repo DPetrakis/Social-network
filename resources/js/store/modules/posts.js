@@ -1,21 +1,29 @@
+import { post } from "jquery";
+import * as immutable from 'object-path-immutable'
 export const posts = {
     
     namespaced: true,
+    
     state: {
-       posts: []
+       
+        posts: [],
+      
     },
+
+
+
     getters: {
         
         posts(state){
-            return state.posts;
+            
+          return state.posts;
+        
         },
 
-        post(state,id){
-            return state.posts[id];
-        }
-
-      
+    
+       
     },
+
     mutations: {
 
         retrievePosts(state,posts){
@@ -23,38 +31,32 @@ export const posts = {
         },
 
         createPostComments(state,comment){
-            for(var i=0; i <state.posts.length; i++)
-            {
-                if(state.posts[i].id== comment.post_id)
-                {
-                    state.posts[i].comments.unshift(comment);
-                    break;
-                }
-            }
+            
+            const postIndex = state.posts.findIndex(post => post.id == comment.post_id)
+            state.posts[postIndex].comments.unshift(comment);
+        
         },
         
         createPostReplies(state,reply){
-          
+            
             for(var i=0; i <state.posts.length; i++)
-            {
-
-                for(var j=0; j < state.posts[i].comments.length; j++)
                 {
+                    for(var j=0; j < state.posts[i].comments.length; j++)
+                    {
                    
-                    if(state.posts[i].comments[j].id == reply.comment_id){
-                        
+                        if(state.posts[i].comments[j].id == reply.comment_id){
                         state.posts[i].comments[j].replies.push(reply);
                         break;
                     }
                 }
-            }
-
+            }  
+        
         },
 
         createPost(state,post){
             
             state.posts.unshift(post);
-        
+           
         },
 
         deletePost(state,deletedpost){
@@ -65,16 +67,13 @@ export const posts = {
         
         deletePostComment(state,deletedcomment){
             
-            for(var i=0; i <state.posts.length; i++)
-            {
-                if(state.posts[i].id == deletedcomment.post_id) {
-                    state.posts[i].comments = state.posts[i].comments.filter(comment => comment.id != deletedcomment.id)
-                    break;
-                }    
-            }
+            const postIndex = state.posts.findIndex(post => post.id == deletedcomment.post_id)
+            state.posts[postIndex].comments = state.posts[postIndex].comments.filter(comment => comment.id != deletedcomment.id)
+                   
         },
 
         deletePostReply(state,deletedreply){
+            
             for(var i=0; i < state.posts.length; i++)
             {
                 for(var j=0; j < state.posts[i].comments.length; j++)
@@ -85,63 +84,49 @@ export const posts = {
                     }
                 }
             }
+
         },
 
 
-        editPost(state,post){
+        editPost(state,updatedpost){
            
-            state.posts = state.posts.filter(post => post.id != post.id)
-            state.posts.unshift(post);
-        
+          state.posts = state.posts.filter(post => post.id != updatedpost.id)
+          state.posts.unshift(updatedpost);
+          
         },
 
+        editPostComment(state,updatedcomment){
+           
+            const postIndex = state.posts.findIndex(post => post.id == updatedcomment.post_id)
+            state.posts[postIndex].comments = state.posts[postIndex].comments.filter(comment => comment.id != updatedcomment.id)
+            state.posts[postIndex].comments.unshift(updatedcomment);
+           
+        },
 
         likePost(state,like){
-             
-            for(var i=0; i < state.posts.length; i++)
             
-            {
-                if(state.posts[i].id == like.post_id){
-                    state.posts[i].likes.push(like);
-                    break;
-                }
-            } 
-
-           
+            const postIndex = state.posts.findIndex(post => post.id == like.post_id)
+            state.posts[postIndex].likes.push(like);
         
         },
 
         dislikePost(state,liked){
-            
-            for(var i=0; i < state.posts.length; i++)
-            {
-                if(state.posts[i].id == liked.post_id){
-                    
-                    state.posts[i].likes = state.posts[i].likes.filter(like => like.id != liked.id)                    
-                    break;
-                }
-            }
 
+            const postIndex = state.posts.findIndex(post => post.id == liked.post_id)
+            state.posts[postIndex].likes = state.posts[postIndex].likes.filter(like => like.id != liked.id)                    
         },
 
-        likeComment(state,likecomment){
-            
-            console.log(likecomment);
-        },
+      
 
-        dislikeComment(state,dislikedcomment){
-            console.log(dislikedcomment);
-        }
-
-        
-
-
-        
-        
     },
+    
+
+    
     actions: {
         
-        retrievePosts(context,id){
+        retrievePosts(context){
+
+          axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
           return new Promise((resolve,reject) => {
             
             axios.get('/api/posts/')
@@ -158,6 +143,23 @@ export const posts = {
 
           });
       
+        },
+
+
+        retrievePostToUpdate(context,data){
+            axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
+            
+            return new Promise((resolve,reject) => {
+            
+                axios.get('/api/posts/' + data.id)
+                .then(response => {
+                   resolve(response)           
+                }).catch(error => {
+                    console.log(error);
+                    reject(error)
+                })
+    
+            });
         },
 
         
@@ -317,9 +319,9 @@ export const posts = {
                 })
                 .then(response => {
                   if(response.data.data != null){
-                    context.commit('likePost',response.data.data);
+                    context.commit('likePost',response.data.data,[1]);
                   }
-                 resolve(response)
+                  resolve(response)
                 })
                 .catch(error => {
                     console.log(error);
@@ -364,17 +366,16 @@ export const posts = {
             
             return new Promise((resolve,reject) => { 
                 
-                axios.post('/api/posts/' + data.id,{
-                    
-                    description : data.description,
-                    image: data.image,
-                    user_id : data.user_id
+                let post_data = new FormData();
                 
-                })
+                post_data.append('description',data.description);
+                post_data.append('image',data.image);
+                post_data.append('user_id',data.user_id);
+
+                axios.post('/api/posts/' + data.id,post_data)
                 .then(response => {
-                      console.log(response);
-                      context.commit('editPost',response.data.data);
-                      resolve(response)
+                    context.commit('editPost',response.data.data);
+                    resolve(response)
                 })
                 .catch(error => {
                     console.log(error);
@@ -382,6 +383,34 @@ export const posts = {
                 })
             
             })
+        },
+
+
+        editPostComment(context,data){
+
+            axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
+            
+            return new Promise((resolve,reject) => { 
+                
+                let comment_data = new FormData();
+                
+                comment_data.append('description',data.description);
+                comment_data.append('image',data.image);
+                comment_data.append('user_id',data.user_id);
+                comment_data.append('post_id',data.post_id);
+
+                axios.post('/api/comments/' + data.id,comment_data)
+                .then(response => {
+                    context.commit('editPostComment',response.data.data);
+                    resolve(response)
+                })
+                .catch(error => {
+                    console.log(error);
+                    reject(error);
+                })
+            
+            })
+        
         },
 
 
@@ -408,16 +437,20 @@ export const posts = {
         likeComment(context,data){
             
             axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
-            
+           
             return new Promise((resolve,reject) => { 
-                
+               
                 axios.post('/api/commentlikes',{
                     user_id : data.user_id,
                     comment_id: data.comment_id,
                 })
                 .then(response => {
-                    console.log(response);
-                    context.commit('likeComment',response.data.data)
+                    var likedcomment = response.data.data
+                    var number = data.post_id
+                    context.commit('likeComment',{
+                        likedcomment,
+                        number
+                    })
                     resolve(response)
                 })
                 .catch(error => {
@@ -431,6 +464,7 @@ export const posts = {
 
 
         dislikeComment(context,data){
+            
             axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
             
             return new Promise((resolve,reject) => { 
@@ -452,6 +486,36 @@ export const posts = {
                 })
             
             })
+        },
+
+        retrieveCommentToUpdate(context,data){
+            
+            axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
+            return new Promise((resolve,reject) => { 
+            
+                axios.get('/api/comments/' + data.id)
+                .then(response => {
+                    resolve(response)
+                })
+                .catch(error => {
+                    reject(error);
+                })
+            })
+        },
+
+        retrieveReplyToUpdate(context,data){
+            axios.defaults.headers.common['Authorization'] = 'Bearer' + context.rootState.token
+            return new Promise((resolve,reject) => { 
+            
+                axios.get('/api/replies/' + data.id)
+                .then(response => {
+                    resolve(response)
+                })
+                .catch(error => {
+                    reject(error);
+                })
+            })
+        
         }
         
 
