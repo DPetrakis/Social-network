@@ -1,1 +1,1 @@
-A social network app i am building in my free time using Laravel in the backend and Vue js in the frontend ! A user can make posts and interact with other users through likes,comments and replies!There is also a chatroom available for users to chat this is made possible with websockets!!
+A social network app i am building in my free time using Laravel in the backend and Vue js in the frontend ! A user can make posts and interact with other users through likes,comments and replies!There is also a chatroom available for users to chat,this is made possible with websockets!!
